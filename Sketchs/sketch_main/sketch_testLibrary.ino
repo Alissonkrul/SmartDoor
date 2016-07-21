@@ -215,6 +215,5 @@ void stateProgramMode()
 }
 
 void loop() {  
-  setState();
   loadState();
 }
