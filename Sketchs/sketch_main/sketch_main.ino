@@ -108,6 +108,7 @@ void setup() {
   // Setup pins
   pinMode(BTN, INPUT);
   pinMode(RELAY, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_RED, OUTPUT);
 
@@ -120,13 +121,6 @@ void setup() {
 
 void loop() {
   loadState();
-
-  // This is a cheat to test if button has been pressed, in any state
-  if (digitalRead(BTN) == HIGH && state != opened)
-  {
-    setState(opened);
-    return;
-  }
 }
 
 // Print key
@@ -169,6 +163,8 @@ void setLED(LedColor color)
  */
  void setState(State newState)
  {
+  lastTime = millis();
+
   switch (newState) {
     case locked:
       Serial.println("Door is LOCKED");
@@ -182,7 +178,7 @@ void setLED(LedColor color)
       lcd.print("RESTRITO");
       setLED(red);
 
-
+      digitalWrite(BUZZER,LOW);
       digitalWrite(BUZZER,HIGH);
       delay(400);
       digitalWrite(BUZZER,LOW);
@@ -216,12 +212,12 @@ void setLED(LedColor color)
 
       for(int i = 0; i < 3; i++)
       {
-        digitalWrite(BUZZER,LOW);
-        setLED(none);
-        delay(200);
-
         digitalWrite(BUZZER,HIGH);
         setLED(red);
+        delay(200);
+
+        digitalWrite(BUZZER,LOW);
+        setLED(none);
         delay(200);
       }
       break;
@@ -251,6 +247,14 @@ void setLED(LedColor color)
  void loadState()
  {
   switch (state) {
+    case locked:
+      stateLocked();
+      break;
+
+    case denied:
+      stateDenied();
+      break;
+
     case opened:
       stateOpen();
       break;
@@ -261,7 +265,6 @@ void setLED(LedColor color)
 
     default:
       stateLocked();
-
   }
 }
 
@@ -363,7 +366,9 @@ void stateDenied()
   if(nuidUtils.compare(masterKey,rfid.uid.uidByte))
   {
     if (millis() > lastTime + 500 )
-    setState(opened);
+    {
+      setState(opened);
+    }
     return;
   }
 
