@@ -22,9 +22,9 @@
  * GUIDE:
  *   This algorithm is based in 'Finite state machine', so keep it in your mind
  * when you will upgrade. Every state is a loop function and is represented by
- * name on enum struct, and 'stateName' in function.A state need conditions
- * to chenge to another. To change state, use 'SetState()'' function. This
- * function will be execute a once time. If you need some script be execute at
+ * name on enum struct, and 'stateName' in function. A state need conditions
+ * to chenge to another. To change state, use 'SetState()' function. This
+ * function will be execute at once time. If you need some script be execute at
  * once, write on this function.
  *
  */
@@ -100,24 +100,22 @@ void setup() {
   SPI.begin();
   rfid.PCD_Init();
 
-  // Clear key memory
+  // Clear rfid key memory
   for (byte i = 0; i < 6; i++) {
     key.keyByte[i] = 0xFF;
   }
 
   // Setup pins
-  pinMode(BTN, INPUT);
-  pinMode(RELAY, OUTPUT);
-  pinMode(BUZZER, OUTPUT);
+  pinMode(      BTN, INPUT);
+  pinMode(    RELAY, OUTPUT);
+  pinMode(   BUZZER, OUTPUT);
+  pinMode(  LED_RED, OUTPUT);
   pinMode(LED_GREEN, OUTPUT);
-  pinMode(LED_RED, OUTPUT);
 
   setState(locked);
 
   nuidUtils.reset();
 }
-
-
 
 void loop() {
   loadState();
@@ -158,8 +156,8 @@ void setLED(LedColor color)
 
 /* SetState
  *
- * This function is used for change state. All scripts inside the 'switch case'
- * will be executed at once.
+ * This function is used for change state. All scripts inside this function
+ * will be executed just one time.
  */
  void setState(State newState)
  {
@@ -242,6 +240,7 @@ void setLED(LedColor color)
  *
  * This function is very simple, just load the function state. Is called every
  * tick of arduino.
+ *
  * DO NOT SCRIPT HERE, STUPID!
  */
  void loadState()
